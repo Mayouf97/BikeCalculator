@@ -20,8 +20,8 @@ Fr = 9.8067*cos(arctan(G/100))*WxCrr
 - Crr: rolling resistance constant (0.005)
 
 6#Calculate V(m/s) using Wattag.</br>
-W = ((Fg+Fd) + 0.2V^2))*V
-
+W = ((Fg+Fd) + 0.2V^2))*V</br>or</br>
+0.2x^3+(Fg+Fd)x-Wattage=0
 More Simplified:
 0.2x^3+(Fg+Fd)x-305=0
 
