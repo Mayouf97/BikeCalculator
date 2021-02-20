@@ -14,10 +14,13 @@ Fg = 9.8067*sin(arctan(G/100))*W
 
 4#Calculate Frolling:</br>
 Fr = 9.8067*cos(arctan(G/100))*WxCrr
-- Crr: rolling resistance constant
+- Crr: rolling resistance constant (0.005)
 
 5#Calculate V(m/s) using Wattag.</br>
 W = ((Fg+Fd) + 0.2V^2))*V
+
+More Simplified:
+0.2x^3+(Fg+Fd)x-305=0
 
 6# Convert Speed V(m/s) to MPH or KMH </br>
 KMH = (V * 3600) / 1000
