@@ -23,5 +23,5 @@ More Simplified:
 0.2x^3+(Fg+Fd)x-305=0
 
 6# Convert Speed V(m/s) to MPH or KMH </br>
-KMH = (V * 3600) / 1000
+KMH = (V * 3600) / 1000</br>
 MPH = (V * 3600) / 1609.34
