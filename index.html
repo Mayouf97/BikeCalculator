@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+
+  <script src="validator.js"></script>
+  <script src="Converter.js" charset="utf-8"></script>
+  <script src="Calculator.js" charset="utf-8"></script>
+
+  <script src="Nerdamer/nerdamer.core.js"></script> <!-- assuming you've saved the file in the root of course -->
+  <!-- LOAD ADD-ONS -->
+  <script src="Nerdamer/Algebra.js"></script>
+  <script src="Nerdamer/Calculus.js"></script>
+  <script src="Nerdamer/Solve.js"></script>
+  <script src="Nerdamer/Extra.js"></script> <!-- again assuming you've saved the files in root -->
+
+  <style>
+    
+  </style>
+</head>
+
+
+<body>
+
+  <div id="unite-switch">
+    <input type="radio" id="male" name="gender" value="male" :checked="unite" @click="metrical()">
+    <label for="male">Metrical</label>
+
+    <input style="margin-left: 1rem;" type="radio" id="male" name="gender" value="male" :checked="!unite"
+      @click="imperial()">
+    <label for="male">Imperial</label>
+  </div>
+
+
+
+  <div id="weight-input">
+    <h5>Weight</h5>
+    <input style="width: 200px !important;" v-model="weight" type="text" @change="listen">
+    <span>{{uniteSymbol ? "kg" : "lbs"}}</span>
+  </div>
+
+
+  <div id="bike-weight-input">
+    <h5>Bike Weight</h5>
+    <input style="width: 200px !important;" v-model="weight" type="text" @change="listen">
+    <span>{{uniteSymbol ? "kg" : "lbs"}}</span>
+  </div>
+
+  <div id="age-input">
+    <h5>Age</h5>
+    <input style="width: 200px !important;" v-model="age" type="text" @change="listen">
+    <span>yrs</span>
+  </div>
+
+
+  <button id="calculateBtn" type="button" name="button" v-on:click="calculate()">
+    Calculate
+  </button>
+
+  
+
+  <div v-if="seen" id="resultPanel">
+    <span><strong>Your Average Speed:</strong></span> </br>
+    <span>{{speed}}</span>
+  </div>
+
+  <script>
+    //unite switcher
+    var uniteSwitcher = new Vue({
+      el: '#unite-switch',
+      data: {
+        unite: true,
+      },
+      methods: {
+        metrical: function () {
+          this.unite = true;
+        },
+        imperial: function () {
+          this.unite = false;
+        },
+      },
+      watch: {
+        'unite': function () {
+          //notify other Components when unite get changed.
+          weightInput.receive(this.unite);
+          bikeweightInput.receive(this.unite);
+          calculateBtn.receive(this.unite);
+          resultPanel.receive(this.unite);
+        }
+      }
+    });
+
+    //Weight Input.
+    var weightInput = new Vue({
+      el: '#weight-input',
+      data: {
+        weight: 70, //default
+        uniteSymbol: true,
+      },
+      methods: {
+        listen: function () {
+          var msg = this.weight;
+          var r = findNumber(msg);
+
+          this.weight = validateBodyWeight(this.uniteSymbol, r);
+        },
+
+        receive: function (data) {
+          if (data == true) {
+            this.uniteSymbol = data;
+            this.weight = lbsTokg(this.weight);
+          } else {
+            this.uniteSymbol = data;
+            this.weight = kgTolbs(this.weight);
+          }
+        }
+      }
+    });
+
+    //Bike Weight Input.
+    var bikeweightInput = new Vue({
+      el: '#bike-weight-input',
+      data: {
+        weight: 7, //default
+        uniteSymbol: true,
+      },
+      methods: {
+        listen: function () {
+          var msg = this.weight;
+          var r = findNumber(msg);
+
+          this.weight = validateBikeWeight(this.uniteSymbol, r);
+        },
+
+        receive: function (data) {
+          if (data == true) {
+            this.uniteSymbol = data;
+            this.weight = lbsTokg(this.weight);
+          } else {
+            this.uniteSymbol = data;
+            this.weight = kgTolbs(this.weight);
+          }
+        },
+
+
+      }
+    });
+
+    //age Input (Done)
+    var ageInput = new Vue({
+      el: '#age-input',
+      data: {
+        age: 18,
+      },
+      methods: {
+        listen: function () {
+          this.age = validateAge(this.age);
+        }
+      }
+    });
+
+
+    var calculateBtn = new Vue({
+      el: '#calculateBtn',
+      data: {
+        unite: true,
+      },
+      methods: {
+        calculate: function () {
+          //Read Necessary Data For Other Components.
+          var tw = weightInput.weight + bikeweightInput.weight;
+          var a = ageInput.age;
+          var u = uniteSwitcher.unite;
+
+          //all Unites Should be in metrical unite for speed calculation.
+          if (u == false) {
+            tw = lbsTokg(tw);
+          }
+
+          var wattage = ftp(a);
+          var F = calculateResistingForces(tw, 0);
+          var vms = calculateSpeed(F, wattage);
+
+          console.log(wattage);
+
+          resultPanel.previewData(vms, u);//show the results
+        },
+        receive: function (data) {
+          this.unite = data;
+          console.log(this.unite);
+
+          console.log('clicked');
+        }
+      }
+    });
+
+
+    var resultPanel = new Vue({
+      el: '#resultPanel',
+      data: {
+        seen: false,
+        speed: 0 //default value.
+      },
+      methods: {
+        previewData: function (vms, u) {
+          //vms is always in kmh.
+          this.seen = true;
+          this.speed = convertSpeed(vms, u) + " " + getSpeedLable(u);
+        },
+
+        receive: function (data) {
+          if (this.seen) {
+            calculateBtn.calculate();
+          }
+        }
+
+      }
+    });
+  </script>
+</body>
+
+
+</html>
